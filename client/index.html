@@ -4,9 +4,13 @@
     <meta charset="utf-8">
     <title>chatterbox</title>
     <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 
     <!-- dependencies -->
+    <script src="bower_components/underscore/underscore-min.js"></script>
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/xss-filters/dist/xss-filters.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
     <script>
       // YOU DO NOT NEED TO EDIT THIS CODE
       if (!/(&|\?)username=/.test(window.location.search)) {
@@ -27,6 +31,16 @@
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
     </div>
-    <div id="chats"></div>
+
+    <div class="form-group" id="chats">
+      <label for="comment">Happy chatting! </label>
+      <textarea class="form-control" rows="5" id="comment"></textarea>
+      <button type="button" class="send-message btn btn-success">Send</button>
+    </div>
+
+
+    <div id="roomSelect"></div>
+    <div id='messages'></div>
+
   </body>
 </html>
