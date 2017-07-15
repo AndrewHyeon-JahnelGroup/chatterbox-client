@@ -5,14 +5,19 @@ body {
     font-family: arial, sans-serif;
 }
 
+.well {
+    vertical-align: middle;
+    text-align: center;
+}
+
 #main, #chats {
     width: 500px;
     margin: auto;
     text-align: left;
     background: #7ABCDA;
     padding: 50px 60px;
-    border: solid #ddd;
-    border-width: 0 1px 1px 1px;
+
+    overflow: scroll    ;
 }
 
 #main h1 {
@@ -46,6 +51,15 @@ body {
     line-height: 13px;
 }
 
+#username {
+    font-weight: bold;
+    float: left;
+}
+
+#message-text {
+    float: right;
+}
+
 form {
     padding: 20px;
     padding-left: 0;
@@ -59,13 +73,16 @@ form input[type=text] {
     padding: 5px;
 }
 
+
 .chat {
     padding: 5px;
     margin-bottom: 5px;
     background-color: #eee;
 }
 
-.chat .username {
+.username {
+    vertical-align: middle;
+    text-align: center;
     font-weight: 800;
 }
 

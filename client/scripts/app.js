@@ -1,10 +1,14 @@
-
+var username = window.location.search.substring(10).replace(/%20/g, ' ');
+var currentRoom = 'Lobby';
+var running;
+var keysList = [];
 
 var app = {
   server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
-  rooms: {},
+  username: '',
+  rooms: [],
   friends: [],
-  messages: {},
+  messages: [],
   init: function(){
 
   },
@@ -14,9 +18,11 @@ var app = {
       url: this.server,
       type: 'POST',
       data: JSON.stringify(message),
-      contentType: 'json',
+      contentType: 'application/json',
       success: function (data) {
         console.log('chatterbox: Message sent');
+        $('#comment').val('');
+
       },
       error: function (data) {
         console.log('chatterbox: Message failed to send .... ' + data);
@@ -28,11 +34,11 @@ var app = {
     $.ajax({
       url: this.server,
       type: 'GET',
-      contentType: 'json',
+      data: {'order': '-createdAt'},
+      contentType: 'application/json',
       success: function(data){
         console.log('chatterbox: Message retrieved');
-        console.log(data + " success");
-        // return data.results;
+        handleMessages(data.results);
       },
       error: function(data){
         console.log('chatterbox: Could not find message');
@@ -51,64 +57,141 @@ var app = {
 
   renderRoom: function(roomName) {
     var $room = $('<p>' + roomName + '</p>');
-    $('#roomSelect').append($room);
+    $('#roomSelect').prepend($room);
   },
 
   handleUsernameClick: function(name) {
-    if(!friends.includes(name)) {
+    if(!this.friends.includes(name)) {
       this.friends.push(name);
+      var $friend = $('<li><a href="#">' + name + '</a></li>');
+      $('.friends').append($friend);
+
+    }
+
+    console.log($('#messages').find())
+
+    for(var i = 0; i < $('#messages').children().length; i++ ) {
+      console.log($('#messages').children()[i])
+      if(name && name === $('#messages').children()[i].children.username.innerText) {
+        var n = $('#messages').children()[i];
+        $(n).css('background-color', '#D7B19E');
+      }
+    }
+  },
+
+  handleRooms: function(room) {
+    if(!this.rooms.includes(room)) {
+      this.rooms.push(room);
+      var $room = $('<li id="room"><a href="#">' + room + '</a></li>');
+      $('.rooms').append($room);
+
+      var myRoom = room;
+      $($room).click( function() {
+        currentRoom = room;
+        console.log('click: ' + room);
+        filterRoom(room);
+
+      });
+
     }
   },
 
   addMessage: function(){
-
 
   }
 
 }
 
 $(document).ready(function() {
-  refresh();
+  app.fetch();
   $('.username').click( function() {
     app.handleUsernameClick();
-  })
+
+  });
 
   $('.send-message').click( function() {
-    console.log('hit');
+    var obj = {text: $('#comment').val(), roomname: currentRoom, username: username};
+    app.send(obj);
+  });
+  $('#lobby').click( function() {
+    clearTimeout(running);
+    currentRoom = 'Lobby';
+    filterRoom('Lobby');
 
-    app.send($('#comment').val());
-  })
+  });
 });
 
-var results;
-var refresh = function(){
+var refresh = function(results){
+  //console.log(results);
 
-  promise.then(function(output) {
-    results = output; // "Stuff worked!"
-  }, function(err) {
-    console.log(err); // Error: "It broke"
-  });
-
-  //var results = Promise.resolve('success').then(app.fetch());
-
-  console.log(JSON.stringify(results) + " failed");
+  clearTimeout(running);
 
   _.each(results, function(result){
-    console.log('in each')
-    var $board = $('<div class="well">' + xssFilters.inHTMLData(result.text) + '</div>');
-    $('#messages').append($board);
+
+    var $board = $('<div class="well"><div class="row" id="username">' + xssFilters.inHTMLData(result.username) +
+      '</div >\n<div class="row" id="message-text">' +
+      xssFilters.inHTMLData(result.text) + '</div></div>');
+    if(filterMessage(result)){
+      $('#messages').prepend($board);
+    }
+
+    $('#username').on('click', function(evt) {
+      app.handleUsernameClick($(this)[0].innerText);
+
+      $('.' + this.username).next().css( "font-weight", "bold" );
+    });
+
   });
 
-  setTimeout((function(){refresh()}), 2000);
+  running = setTimeout((function(){app.fetch()}), 2000);
+
+};
+var handleMessages = function(messages) {
+
+  var results = [];
+  _.each(messages, function(message){
+
+    if(!keysList.includes(message.objectId)){
+      app.messages.unshift(message);
+      keysList.push(message.objectId);
+      results.push(message);
+      app.handleRooms(message.roomname);
+    }
+  });
+
+
+  refresh(results);
 }
 
-var promise = new Promise(function(resolve, reject) {
-  app.fetch();
+var filterRoom = function(room) {
+  clearTimeout(running);
+  $('#messages').empty();
 
-  if (app.fetch()) {
-    resolve(results);
+  var results = [];
+  // console.log(room);
+  if(room === 'Lobby') {
+    console.log("In lobby");
+    _.each(app.messages, function(message) {
+      results.push(message);
+    });
+  } else {
+    results = _.filter(app.messages, function(message){
+      return message.roomname === room;
+    });
   }
-  else {
-    reject(Error("It broke"));
-  }
-});
+
+  refresh(results);
+}
+
+var filterMessage = function(message){
+  if(currentRoom === 'Lobby') return true;
+  return message.roomname === currentRoom;
+}
+
+var turnOnRoom = function() {
+
+}
+
+
+
+
