@@ -35,7 +35,7 @@ var app = {
       url: this.server,
       type: 'GET',
       data: {'order': '-createdAt'},
-      contentType: 'application/json',
+      contentType: 'json',
       success: function(data){
         console.log('chatterbox: Message retrieved');
         handleMessages(data.results);
@@ -117,7 +117,6 @@ $(document).ready(function() {
     clearTimeout(running);
     currentRoom = 'Lobby';
     filterRoom('Lobby');
-
   });
 });
 
