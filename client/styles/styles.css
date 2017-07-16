@@ -11,6 +11,7 @@ body {
     border: 0px;
     height: 45px;
     width: 200px;
+    vertical-align: middle;
 }
 
 img {

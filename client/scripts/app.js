@@ -96,7 +96,12 @@ var app = {
     }
   },
 
-  addMessage: function(){
+  addRoom: function(room){
+    if(this.rooms.includes(room)){
+      alert('this room is already created');
+    }
+    currentRoom = room;
+    this.rooms.push(room);
 
   }
 
@@ -118,6 +123,11 @@ $(document).ready(function() {
     currentRoom = 'Lobby';
     filterRoom('Lobby');
   });
+  $('#newroom').click( function() {
+    var roomname = window.prompt('Please enter new room name', 'new room');
+    app.addRoom(roomname)
+    app.renderRoom(roomname)
+  })
 });
 
 var refresh = function(results){
